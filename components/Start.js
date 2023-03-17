@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+// Import necessary modules and components from React Native and Firebase
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,9 +11,11 @@ import {
   Dimensions,
   Keyboard,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
+import { getAuth, signInAnonymously } from "firebase/auth";
 
-// A dictionary of color options, where each key is a color name and each value is a style object
+// Background Color options for Chat screen
 const backgroundColors = {
   black: { backgroundColor: "#090C08" },
   purple: { backgroundColor: "#474056" },
@@ -24,96 +27,94 @@ const backgroundColors = {
 const SelectedColorOverlay = () => <View style={styles.selectedColorOverlay} />;
 
 // The main Start component
-export default class Start extends Component {
-  constructor(props) {
-    super(props);
-    // Initialize the component's state with an empty name and no selected color
-    this.state = { name: "", color: "" };
-  }
+const Start = ({ navigation }) => {
+  // Declare state variables for user's name and selected color
+  const [name, setName] = useState("");
+  const [color, setColor] = useState("");
 
-  render() {
-    // Extract the name and color properties from the component's state
-    const { name, color } = this.state;
-    // Extract the individual color options from the backgroundColors dictionary
-    const { black, purple, grey, green } = backgroundColors;
-    // Get the height of the device's screen
-    const windowHeight = Dimensions.get("window").height;
-    // Calculate the desired height of the box containing the input fields and color options
-    const boxHeight = windowHeight * 0.44;
-    // Set a default background color for the chat screen if the user doesn't select a color
-    const defaultColor = "#FFFFFF";
+  // Function to handle anonymous sign-in with Firebase Auth
+  const handleSignIn = () => {
+    const auth = getAuth();
+    signInAnonymously(auth)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        // Navigate to Chat screen with user's name, color, and ID
+        navigation.navigate("Chat", {
+          name,
+          color: color || "#FFFFFF",
+          userID: user.uid,
+        });
+        Alert.alert("Signed in Successfully!");
+      })
+      .catch((error) => {
+        Alert.alert("Unable to add. Please try later");
+      });
+  };
 
-    // Map over the backgroundColors dictionary to create a list of color options
-    const colorOptions = Object.entries(backgroundColors).map(
-      ([key, value]) => (
-        <TouchableOpacity
-          key={key}
-          // Apply the color option's style to the TouchableOpacity
-          style={[
-            styles.color,
-            value,
-            // If this color is currently selected, also apply the "selected" style
-            color === value.backgroundColor && styles.colorSelected,
-          ]}
-          onPress={() => this.setState({ color: value.backgroundColor })}
+  // Destructure background color styles from backgroundColors object
+  const { black, purple, grey, green } = backgroundColors;
+  // Get height of device window
+  const windowHeight = Dimensions.get("window").height;
+  // Calculate height of colored box
+  const boxHeight = windowHeight * 0.44;
+  // Define default color if none selected
+  const defaultColor = "#FFFFFF";
+
+  // Map over backgroundColors object to create color options for user to choose from
+  const colorOptions = Object.entries(backgroundColors).map(([key, value]) => (
+    <TouchableOpacity
+      key={key}
+      style={[
+        styles.color,
+        value,
+        color === value.backgroundColor && styles.colorSelected,
+      ]}
+      onPress={() => setColor(value.backgroundColor)}
+    >
+      {color === value.backgroundColor && <SelectedColorOverlay />}
+    </TouchableOpacity>
+  ));
+
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <ImageBackground
+          source={require("../assets/background-image.png")}
+          style={styles.image}
         >
-          {/* If this color is currently selected, display the overlay */}
-          {color === value.backgroundColor && <SelectedColorOverlay />}
-        </TouchableOpacity>
-      )
-    );
-
-    return (
-      // Dismiss the keyboard when the user taps outside of the input fields
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <ImageBackground
-            source={require("../assets/background-image.png")}
-            style={styles.image}
-          >
-            <View style={styles.titleContainer}>
-              <Text style={styles.title}>Hello World!</Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>Hello World!</Text>
+          </View>
+          <View style={[styles.box, { height: boxHeight }]}>
+            <View style={styles.inputContainer}>
+              <Image
+                source={require("../assets/icon.png")}
+                style={styles.inputImage}
+              />
+              <TextInput
+                style={styles.input}
+                onChangeText={setName}
+                value={name}
+                placeholder="Your Name"
+                placeholderTextColor="#ADADAD"
+                returnKeyType="done"
+              />
             </View>
-            <View style={[styles.box, { height: boxHeight }]}>
-              <View style={styles.inputContainer}>
-                <Image
-                  source={require("../assets/icon.png")}
-                  style={styles.inputImage}
-                />
-                <TextInput
-                  style={styles.input}
-                  // Update the component's state with the new name value
-                  onChangeText={(name) => this.setState({ name })}
-                  value={name}
-                  placeholder="Your Name"
-                  placeholderTextColor="#ADADAD"
-                />
-              </View>
-              <View style={styles.colorContainer}>
-                <Text style={styles.colorLabel}>
-                  Choose your Background Color:
-                </Text>
-                <View style={styles.colorOptions}>{colorOptions}</View>
-              </View>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() =>
-                  // Navigate to the Chat screen and pass in the user's name and selected color (or default color if none selected)
-                  this.props.navigation.navigate("Chat", {
-                    name,
-                    color: color || defaultColor,
-                  })
-                }
-              >
-                <Text style={styles.buttonText}>Start Chatting</Text>
-              </TouchableOpacity>
+            <View style={styles.colorContainer}>
+              <Text style={styles.colorLabel}>
+                Choose your Background Color:
+              </Text>
+              <View style={styles.colorOptions}>{colorOptions}</View>
             </View>
-          </ImageBackground>
-        </View>
-      </TouchableWithoutFeedback>
-    );
-  }
-}
+            <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+              <Text style={styles.buttonText}>Start Chatting</Text>
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
+      </View>
+    </TouchableWithoutFeedback>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -213,3 +214,5 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
+
+export default Start;
