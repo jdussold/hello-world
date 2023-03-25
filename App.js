@@ -4,13 +4,22 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import "react-native-gesture-handler";
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { LogBox } from "react-native";
+import {
+  getFirestore,
+  disableNetwork,
+  enableNetwork,
+} from "firebase/firestore";
 import Start from "./components/Start";
 import Chat from "./components/Chat";
+import { useNetInfo } from "@react-native-community/netinfo";
+import { useEffect } from "react";
+import { LogBox, Alert } from "react-native";
 
 // Ignore expo warning messages
-LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
+LogBox.ignoreLogs([
+  "AsyncStorage has been extracted from",
+  "Cannot connect to Metro",
+]);
 
 // Create a navigator using createStackNavigator
 const Stack = createStackNavigator();
@@ -29,6 +38,17 @@ const App = () => {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  const connectionStatus = useNetInfo();
+
+  useEffect(() => {
+    if (connectionStatus.isConnected === false) {
+      Alert.alert("Connection Lost!");
+      disableNetwork(db);
+    } else if (connectionStatus.isConnected === true) {
+      enableNetwork(db);
+    }
+  }, [connectionStatus.isConnected]);
+
   // Render the app with NavigationContainer and Stack.Navigator
   return (
     <NavigationContainer>
@@ -36,7 +56,13 @@ const App = () => {
         {/* Define two screens using Stack.Screen, with Start and Chat components as their respective components */}
         <Stack.Screen name="Start" component={Start} />
         <Stack.Screen name="Chat">
-          {(props) => <Chat db={db} {...props} />}
+          {(props) => (
+            <Chat
+              isConnected={connectionStatus.isConnected}
+              db={db}
+              {...props}
+            />
+          )}
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
