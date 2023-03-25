@@ -1,4 +1,4 @@
-// Import necessary modules and components from React and React Native
+// Import the necessary modules
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -7,7 +7,7 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import {
   collection,
   query,
@@ -15,6 +15,7 @@ import {
   onSnapshot,
   addDoc,
 } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Function to customize the appearance of chat bubbles
 const renderBubble = (props) => {
@@ -33,8 +34,15 @@ const renderBubble = (props) => {
   );
 };
 
+// Function to conditionally render the input toolbar based upon a users connection status
+const renderInputToolbar = (props, isConnected) => {
+  if (isConnected) return <InputToolbar {...props} />;
+  else return null;
+};
+
 // Define the Chat component as the default export of the module
-export default function Chat({ navigation, route, db }) {
+export default function Chat({ navigation, route, db, isConnected }) {
+  //State for storing chat messages
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
@@ -52,25 +60,44 @@ export default function Chat({ navigation, route, db }) {
       },
     });
 
-    // Listen for updates on the "messages" collection in real-time
-    const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const fetchedMessages = [];
-      querySnapshot.forEach((doc) => {
-        const fetchedMessage = doc.data();
-        fetchedMessage.createdAt = new Date(
-          fetchedMessage.createdAt.seconds * 1000
-        );
-        fetchedMessages.push(fetchedMessage);
-      });
-      setMessages(fetchedMessages);
-    });
+    // Fetching messages from Firebase if connected, otherwise from local storage
+    if (isConnected) {
+      const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+      const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+        const fetchedMessages = [];
+        querySnapshot.forEach((doc) => {
+          const fetchedMessage = doc.data();
+          fetchedMessage.createdAt = new Date(
+            fetchedMessage.createdAt.seconds * 1000
+          );
+          fetchedMessages.push(fetchedMessage);
+        });
 
-    // Clean up the listener
-    return () => {
-      unsubscribe();
-    };
-  }, [navigation, route.params.name, route.params.color, db]);
+        try {
+          await AsyncStorage.setItem(
+            "messages",
+            JSON.stringify(fetchedMessages)
+          );
+        } catch (error) {
+          console.log(error);
+        }
+
+        setMessages(fetchedMessages);
+      });
+
+      // Unsubscribe from Firebase listener on component unmount
+      return () => {
+        unsubscribe();
+      };
+    } else {
+      // Get cached messages from local storage
+      AsyncStorage.getItem("messages").then((cachedMessages) => {
+        if (cachedMessages !== null) {
+          setMessages(JSON.parse(cachedMessages));
+        }
+      });
+    }
+  }, [navigation, route.params.name, route.params.color, db, isConnected]);
 
   // Function that adds a new message to the "messages" collection in Firestore when the user sends a message
   const onSend = (newMessages) => {
@@ -94,6 +121,7 @@ export default function Chat({ navigation, route, db }) {
           _id: route.params.userID,
           name: route.params.name,
         }}
+        renderInputToolbar={(props) => renderInputToolbar(props, isConnected)}
       />
       {Platform.OS === "android" ? (
         <KeyboardAvoidingView behavior="height" />
