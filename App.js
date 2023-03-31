@@ -14,6 +14,7 @@ import Chat from "./components/Chat";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useEffect } from "react";
 import { LogBox, Alert } from "react-native";
+import { getStorage } from "firebase/storage";
 
 // Ignore expo warning messages
 LogBox.ignoreLogs([
@@ -24,6 +25,7 @@ LogBox.ignoreLogs([
 // Create a navigator using createStackNavigator
 const Stack = createStackNavigator();
 
+// Define the main component of the app
 const App = () => {
   const firebaseConfig = {
     apiKey: "AIzaSyD80gTYOsQnNFBXLsJH0BW0rKUy-tmHyPQ",
@@ -37,9 +39,11 @@ const App = () => {
   // Initialize Firebase app
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
   const connectionStatus = useNetInfo();
 
+  // Monitor changes in the network connection status
   useEffect(() => {
     if (connectionStatus.isConnected === false) {
       Alert.alert("Connection Lost!");
@@ -60,6 +64,7 @@ const App = () => {
             <Chat
               isConnected={connectionStatus.isConnected}
               db={db}
+              storage={storage}
               {...props}
             />
           )}

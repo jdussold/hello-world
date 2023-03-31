@@ -16,6 +16,8 @@ import {
   addDoc,
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomActions from "./CustomActions";
+import MapView from "react-native-maps";
 
 // Function to customize the appearance of chat bubbles
 const renderBubble = (props) => {
@@ -35,15 +37,16 @@ const renderBubble = (props) => {
 };
 
 // Function to conditionally render the input toolbar based upon a users connection status
-const renderInputToolbar = (props, isConnected) => {
+const renderInputToolbar = (isConnected) => (props) => {
   if (isConnected) return <InputToolbar {...props} />;
   else return null;
 };
 
 // Define the Chat component as the default export of the module
-export default function Chat({ navigation, route, db, isConnected }) {
+export default function Chat({ navigation, route, db, isConnected, storage }) {
   //State for storing chat messages
   const [messages, setMessages] = useState([]);
+  const { name, userID } = route.params;
 
   useEffect(() => {
     // Retrieve the name and color values from the navigation prop
@@ -107,8 +110,38 @@ export default function Chat({ navigation, route, db, isConnected }) {
       user: {
         _id: route.params.userID,
         name: route.params.name,
+        avatar: "https://placebear.com/140/140",
       },
     });
+  };
+
+  //Render custom actions for sending images, locations, etc...
+  const renderCustomActions = (props) => {
+    return <CustomActions storage={storage} {...props} />;
+  };
+
+  // Render custom view for displaying locations
+  const renderCustomView = (props) => {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <View style={{ margin: 5, borderRadius: 13, overflow: "hidden" }}>
+          <MapView
+            style={{
+              width: 150,
+              height: 100,
+            }}
+            region={{
+              latitude: currentMessage.location.latitude,
+              longitude: currentMessage.location.longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+          />
+        </View>
+      );
+    }
+    return null;
   };
 
   return (
@@ -116,12 +149,15 @@ export default function Chat({ navigation, route, db, isConnected }) {
       <GiftedChat
         messages={messages}
         renderBubble={renderBubble}
-        onSend={onSend}
+        renderInputToolbar={renderInputToolbar(isConnected)}
+        onSend={(messages) => onSend(messages)}
+        renderActions={renderCustomActions}
+        renderCustomView={renderCustomView}
         user={{
-          _id: route.params.userID,
-          name: route.params.name,
+          _id: userID,
+          name,
+          avatar: "https://placebear.com/140/140",
         }}
-        renderInputToolbar={(props) => renderInputToolbar(props, isConnected)}
       />
       {Platform.OS === "android" ? (
         <KeyboardAvoidingView behavior="height" />
