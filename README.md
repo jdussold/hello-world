@@ -64,13 +64,13 @@ The `App` component requires the following dependencies to be installed:
 
 To use the `App` component, import it into your React Native project and include it in your app:
 
-```import App from './App';
+`import App from './App';
 
 export default function MyChatApp() {
 return (
 <App />
 );
-}```
+}`
 
 ## Props
 
