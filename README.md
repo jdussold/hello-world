@@ -132,8 +132,8 @@ Alert and LogBox
 
 The `App` component uses `Alert` from `react-native` to display an alert when the network connection is lost. It also uses `LogBox` from `react-native` to ignore warning messages related to AsyncStorage and Metro.
 
-React Native Chat App: Start Component
-======================================
+Start.js
+========
 
 The Start component is the landing page of the React Native chat app. It allows the user to enter their name and choose a background color for the chat screen before joining the chat. This component uses Firebase anonymous authentication to create a new user ID for the user.
 
@@ -198,6 +198,78 @@ The component uses the following dependencies:
 -   react-native-gesture-handler
 
 Note: Make sure to install these dependencies in your project before using the Start component.
+
+Chat.js
+-------
+
+The Chat component is responsible for displaying the main chat screen of the application where users can send and receive messages. It contains several features such as customized bubbles, the ability to send images and location data, and it supports both online and offline messaging.
+
+### Dependencies
+
+The following modules and components are used in the Chat component:
+
+-   React
+-   React Native
+-   Firebase Firestore
+-   Gifted Chat
+-   AsyncStorage
+-   CustomActions
+-   MapView
+
+### Usage
+
+The Chat component can be imported and used in any parent component like any other React component. It requires several props to be passed in when it is called:
+
+-   `navigation`: This is a prop that is passed in automatically by the React Navigation library. It is used for navigating to and from different screens in the application.
+
+-   `route`: This is also a prop that is passed in automatically by the React Navigation library. It contains information about the current route that the user is on, including the name, color, and user ID.
+
+-   `db`: This is a reference to the Firebase Firestore database. It is used to interact with the messages collection and add new messages to the collection.
+
+-   `isConnected`: This is a boolean value that is passed in to indicate whether the user is connected to the internet or not. If the user is offline, messages will be stored locally until the user is connected again.
+
+-   `storage`: This is a reference to the Firebase Storage service. It is used to upload and download images that are sent through the chat.
+
+### Customizations
+
+The Chat component can be customized in several ways:
+
+-   Customized bubbles: The appearance of chat bubbles can be customized using the `renderBubble` function.
+
+-   Custom input toolbar: The input toolbar can be conditionally rendered based on the user's connection status using the `renderInputToolbar` function.
+
+-   Custom actions: Custom actions such as sending images and location data can be added using the `renderCustomActions` function.
+
+-   Custom view for displaying locations: The `renderCustomView` function can be used to create a custom view for displaying location data.
+
+### Example Usage
+
+javascriptCopy code
+
+`import React from 'react';
+import { View } from 'react-native';
+import firebase from 'firebase';
+import Chat from './Chat';
+
+// Initialize Firebase app
+firebase.initializeApp({
+  // your firebase config goes here
+});
+
+const App = () => {
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Chat db={db} storage={storage} />
+    </View>
+  );
+};
+
+export default App;`
+
+Note: In the above example, the `isConnected` prop is not passed in explicitly, so it defaults to `true`. If the user is offline, messages will be stored locally until the user is connected again.
 
 CustomActions.js
 ================
