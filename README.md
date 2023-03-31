@@ -64,13 +64,15 @@ The `App` component requires the following dependencies to be installed:
 
 To use the `App` component, import it into your React Native project and include it in your app:
 
-`import App from './App';
+```
+import App from './App';
 
 export default function MyChatApp() {
 return (
 <App />
 );
-}`
+}
+```
 
 ## Props
 
@@ -87,14 +89,16 @@ The `App` component imports and renders two other components:
 
 The `App` component requires a Firebase configuration object with the following properties:
 
-`const firebaseConfig = {
+```
+const firebaseConfig = {
   apiKey: "<API_KEY>",
   authDomain: "<AUTH_DOMAIN>",
   projectId: "<PROJECT_ID>",
   storageBucket: "<STORAGE_BUCKET>",
   messagingSenderId: "<MESSAGING_SENDER_ID>",
   appId: "<APP_ID>"
-};`
+};
+```
 
 To set up Firebase, you need to create a project in the Firebase Console, enable the Firestore and Storage services, and then copy the configuration object to your app. For more information, see the Firebase documentation.
 
@@ -222,7 +226,8 @@ The Chat component can be customized in several ways:
 
 ### Example Usage
 
-`import React from 'react';
+```
+import React from 'react';
 import { View } from 'react-native';
 import firebase from 'firebase';
 import Chat from './Chat';
@@ -243,7 +248,8 @@ return (
 );
 };
 
-export default App;`
+export default App;
+```
 
 Note: In the above example, the `isConnected` prop is not passed in explicitly, so it defaults to `true`. If the user is offline, messages will be stored locally until the user is connected again.
 
@@ -257,7 +263,8 @@ Usage:
 
 To use the `CustomActions` component, import it into your React Native project and include it in your chat interface.
 
-`import CustomActions from './CustomActions';
+```
+import CustomActions from './CustomActions';
 
 <CustomActions
 wrapperStyle={{}}
@@ -265,7 +272,8 @@ iconTextStyle={{}}
 storage={firebase.storage()}
 onSend={(message) => handleSend(message)}
 userID={currentUser.uid}
-/>`
+/>
+```
 
 Props:
 
@@ -339,3 +347,10 @@ That's it! You should now be able to test the app on your Android emulator using
 ## Credits
 
 This application was created by John Dussold as part of the CareerFoundry JavaScript FullStack curriculum.
+
+````
+
+```
+
+```
+````
