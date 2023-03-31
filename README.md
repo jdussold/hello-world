@@ -48,7 +48,7 @@ The application is built using React Native and uses the following dependencies:
 Components
 ----------
 
-App
+App.js
 ===
 
 The `App` component is the main component of the React Native chat app. It sets up the navigation and handles the connection to the Firebase database.
@@ -131,6 +131,58 @@ Alert and LogBox
 ----------------
 
 The `App` component uses `Alert` from `react-native` to display an alert when the network connection is lost. It also uses `LogBox` from `react-native` to ignore warning messages related to AsyncStorage and Metro.
+
+CustomActions.js:
+
+`CustomActions.js` is a component that allows users to perform different actions within the chat interface, such as uploading an image, taking a photo, or sharing their current location.
+
+Usage:
+
+To use the `CustomActions` component, import it into your React Native project and include it in your chat interface.
+
+javascriptCopy code
+
+`import CustomActions from './CustomActions';
+
+<CustomActions
+  wrapperStyle={{}}
+  iconTextStyle={{}}
+  storage={firebase.storage()}
+  onSend={(message) => handleSend(message)}
+  userID={currentUser.uid}
+/>`
+
+Props:
+
+The `CustomActions` component accepts the following props:
+
+-   `wrapperStyle` (optional): Custom styles to be applied to the container of the action button.
+-   `iconTextStyle` (optional): Custom styles to be applied to the text of the action button.
+-   `storage` (required): An instance of Firebase storage.
+-   `onSend` (required): A callback function to be executed when the user sends a message.
+-   `userID` (required): The ID of the current user.
+
+Methods:
+
+The `CustomActions` component has the following methods:
+
+-   `pickImage()`: Allows users to select an image from their device's media library.
+-   `takePhoto()`: Allows users to take a photo with their device's camera.
+-   `getLocation()`: Retrieves the user's current location and sends it as a message.
+-   `uploadAndSendImage(imageURI)`: Uploads an image to Firebase storage and sends it as a message.
+
+Dependencies:
+
+The `CustomActions` component has the following dependencies:
+
+-   `@expo/react-native-action-sheet`: A library that provides a cross-platform `ActionSheet` component for React Native.
+-   `expo-image-picker`: A library that provides an interface for accessing the device's media library and camera.
+-   `expo-location`: A library that provides an interface for accessing the device's current location.
+-   `firebase/storage`: Firebase storage module for storing and retrieving files.
+
+Note: Make sure to install these dependencies in your project before using the `CustomActions` component.
+
+
 
 Credits
 -------
