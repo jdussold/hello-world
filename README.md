@@ -45,7 +45,92 @@ The application is built using React Native and uses the following dependencies:
 -   @react-navigation/native
 -   @react-navigation/stack
 
-The entry point for the application is `App.js`, which sets up the navigator for the application. The `Start` component is responsible for rendering the screen where users can enter their name and choose a background color for the chat screen. The `Chat` component is responsible for rendering the chat screen, where users can exchange messages, images and location data.
+Components
+----------
+
+App
+===
+
+The `App` component is the main component of the React Native chat app. It sets up the navigation and handles the connection to the Firebase database.
+
+Dependencies
+------------
+
+The `App` component requires the following dependencies to be installed:
+
+-   `@react-navigation/native`
+-   `@react-navigation/stack`
+-   `react-native-gesture-handler`
+-   `firebase/app`
+-   `firebase/firestore`
+-   `firebase/storage`
+-   `@react-native-community/netinfo`
+
+Usage
+-----
+
+To use the `App` component, import it into your React Native project and include it in your app:
+
+javascriptCopy code
+
+`import App from './App';
+
+export default function MyChatApp() {
+  return (
+    <App />
+  );
+}`
+
+Props
+-----
+
+The `App` component does not accept any props.
+
+Components
+----------
+
+The `App` component imports and renders two other components:
+
+-   `Start`: The start screen where the user enters their name and chooses a background color.
+-   `Chat`: The chat screen where the user can send and receive messages.
+
+Firebase Configuration
+----------------------
+
+The `App` component requires a Firebase configuration object with the following properties:
+
+javascriptCopy code
+
+`const firebaseConfig = {
+  apiKey: "<API_KEY>",
+  authDomain: "<AUTH_DOMAIN>",
+  projectId: "<PROJECT_ID>",
+  storageBucket: "<STORAGE_BUCKET>",
+  messagingSenderId: "<MESSAGING_SENDER_ID>",
+  appId: "<APP_ID>"
+};`
+
+To set up Firebase, you need to create a project in the Firebase Console, enable the Firestore and Storage services, and then copy the configuration object to your app. For more information, see the Firebase documentation.
+
+Network Status
+--------------
+
+The `App` component uses the `useNetInfo` hook from `@react-native-community/netinfo` to monitor changes in the network connection status. If the device loses connection, the app disables the Firestore network and displays an alert to the user.
+
+Stack Navigator
+---------------
+
+The `App` component uses `createStackNavigator` from `@react-navigation/stack` to set up the navigation between the `Start` and `Chat` screens.
+
+Firestore and Storage
+---------------------
+
+The `App` component initializes the Firebase app, Firestore database, and Storage instance using the `initializeApp`, `getFirestore`, and `getStorage` functions from `firebase/app`, `firebase/firestore`, and `firebase/storage`, respectively.
+
+Alert and LogBox
+----------------
+
+The `App` component uses `Alert` from `react-native` to display an alert when the network connection is lost. It also uses `LogBox` from `react-native` to ignore warning messages related to AsyncStorage and Metro.
 
 Credits
 -------
