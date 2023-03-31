@@ -322,9 +322,52 @@ The `CustomActions` component has the following dependencies:
 
 Note: Make sure to install these dependencies in your project before using the `CustomActions` component.
 
+Testing the App
+===============
+
+Below is a basic guide on setting up Expo and Android Studio to test the app:
+
+1.  Install Node.js on your machine by downloading the installer from the official website and following the installation instructions.
+
+2.  Install Expo CLI by opening a terminal or command prompt window and typing the following command:
+
+Copy code
+
+`npm install -g expo-cli`
+
+1.  Install Android Studio by downloading it from the official website and following the installation instructions. This will install the Android SDK and necessary dependencies.
+
+2.  Open Android Studio and navigate to the SDK Manager. Under the "SDK Platforms" tab, make sure that the latest version of Android (currently Android 12) is installed. Under the "SDK Tools" tab, make sure that the following items are installed:
+
+-   Android SDK Build-Tools
+-   Android Emulator
+-   Android SDK Platform-Tools
+-   Android SDK Tools
+
+1.  Configure the Android emulator by opening the AVD Manager in Android Studio. Create a new virtual device with the desired specifications (e.g. Pixel 4, API Level 31).
+
+2.  Clone or download the app source code from the GitHub repository.
+
+3.  Open a terminal or command prompt window and navigate to the app directory.
+
+4.  Install the required dependencies by typing the following command:
+
+Copy code
+
+`npm install`
+
+1.  Start the Expo development server by typing the following command:
+
+sqlCopy code
+
+`expo start`
+
+1.  Once the development server is running, you can use your Android emulator to test the app. Open the emulator and wait for it to fully load. Then, in the Expo development server window, click "Run on Android device/emulator" and follow the instructions to install and launch the app on the emulator.
+
+That's it! You should now be able to test the app on your Android emulator using Expo. If you encounter any issues or errors, refer to the official Expo and Android Studio documentation for troubleshooting help.
 
 
 Credits
 -------
 
-This application was created by John Dussold.
+This application was created by John Dussold as part of the CareerFoundry JavaScript FullStack curriculum.
