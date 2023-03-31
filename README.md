@@ -64,8 +64,6 @@ The `App` component requires the following dependencies to be installed:
 
 To use the `App` component, import it into your React Native project and include it in your app:
 
-javascriptCopy code
-
 `import App from './App';
 
 export default function MyChatApp() {
@@ -88,8 +86,6 @@ The `App` component imports and renders two other components:
 ## Firebase Configuration
 
 The `App` component requires a Firebase configuration object with the following properties:
-
-javascriptCopy code
 
 `const firebaseConfig = {
   apiKey: "<API_KEY>",
@@ -226,8 +222,6 @@ The Chat component can be customized in several ways:
 
 ### Example Usage
 
-javascriptCopy code
-
 `import React from 'react';
 import { View } from 'react-native';
 import firebase from 'firebase';
@@ -262,8 +256,6 @@ Note: In the above example, the `isConnected` prop is not passed in explicitly, 
 Usage:
 
 To use the `CustomActions` component, import it into your React Native project and include it in your chat interface.
-
-javascriptCopy code
 
 `import CustomActions from './CustomActions';
 
@@ -313,8 +305,6 @@ Below is a basic guide on setting up Expo and Android Studio to test the app:
 
 2.  Install Expo CLI by opening a terminal or command prompt window and typing the following command:
 
-Copy code
-
 `npm install -g expo-cli`
 
 1.  Install Android Studio by downloading it from the official website and following the installation instructions. This will install the Android SDK and necessary dependencies.
@@ -336,13 +326,9 @@ Copy code
 
 4.  Install the required dependencies by typing the following command:
 
-Copy code
-
 `npm install`
 
 1.  Start the Expo development server by typing the following command:
-
-sqlCopy code
 
 `expo start`
 
