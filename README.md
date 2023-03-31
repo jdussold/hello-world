@@ -132,7 +132,8 @@ Alert and LogBox
 
 The `App` component uses `Alert` from `react-native` to display an alert when the network connection is lost. It also uses `LogBox` from `react-native` to ignore warning messages related to AsyncStorage and Metro.
 
-CustomActions.js:
+CustomActions.js
+----------------
 
 `CustomActions.js` is a component that allows users to perform different actions within the chat interface, such as uploading an image, taking a photo, or sharing their current location.
 
