@@ -347,10 +347,3 @@ That's it! You should now be able to test the app on your Android emulator using
 ## Credits
 
 This application was created by John Dussold as part of the CareerFoundry JavaScript FullStack curriculum.
-
-````
-
-```
-
-```
-````
