@@ -200,7 +200,7 @@ The component uses the following dependencies:
 Note: Make sure to install these dependencies in your project before using the Start component.
 
 Chat.js
--------
+=======
 
 The Chat component is responsible for displaying the main chat screen of the application where users can send and receive messages. It contains several features such as customized bubbles, the ability to send images and location data, and it supports both online and offline messaging.
 
