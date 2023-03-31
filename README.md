@@ -132,8 +132,75 @@ Alert and LogBox
 
 The `App` component uses `Alert` from `react-native` to display an alert when the network connection is lost. It also uses `LogBox` from `react-native` to ignore warning messages related to AsyncStorage and Metro.
 
+React Native Chat App: Start Component
+======================================
+
+The Start component is the landing page of the React Native chat app. It allows the user to enter their name and choose a background color for the chat screen before joining the chat. This component uses Firebase anonymous authentication to create a new user ID for the user.
+
+User Stories
+------------
+
+The Start component aims to fulfill the following user stories:
+
+-   As a new user, I want to be able to easily enter my name and choose a background color for the chat screen so that I can start chatting with my friends and family members.
+
+Key Features
+------------
+
+The Start component provides the following key features:
+
+-   A page where users can enter their name and choose a background color for the chat screen before joining the chat.
+-   A button that initiates Firebase anonymous authentication and takes the user to the Chat screen.
+
+Technical Information
+---------------------
+
+The Start component is built using React Native and uses the following dependencies:
+
+-   react
+-   react-native
+-   firebase/auth
+-   react-native-gesture-handler
+
+Getting Started
+---------------
+
+To get started with the component, follow these steps:
+
+1.  Clone the repository to your local machine.
+2.  Navigate to the `Start` directory.
+3.  Install the dependencies by running `npm install`.
+4.  Start the application by running `npm start`.
+
+Usage
+-----
+
+To use the component, import it into your React Native project and include it in your navigation stack.
+
+Props
+-----
+
+The component does not accept any props.
+
+Styling
+-------
+
+The component uses a StyleSheet object to define its styles. You can customize the styles by editing this object.
+
+Dependencies
+------------
+
+The component uses the following dependencies:
+
+-   react
+-   react-native
+-   firebase/auth
+-   react-native-gesture-handler
+
+Note: Make sure to install these dependencies in your project before using the Start component.
+
 CustomActions.js
-----------------
+================
 
 `CustomActions.js` is a component that allows users to perform different actions within the chat interface, such as uploading an image, taking a photo, or sharing their current location.
 
