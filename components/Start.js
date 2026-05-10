@@ -11,6 +11,7 @@ import {
   Dimensions,
   Keyboard,
   Pressable,
+  Platform,
   Alert,
 } from "react-native";
 import { getAuth, signInAnonymously } from "firebase/auth";
@@ -76,7 +77,13 @@ const Start = ({ navigation }) => {
   ));
 
   return (
-    <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+    <Pressable
+      // Web has no soft keyboard; tap-to-dismiss only applies to native.
+      // Without the platform gate, click events bubble from TextInput to this
+      // Pressable and Keyboard.dismiss() blurs the just-focused input.
+      onPress={Platform.OS === "web" ? undefined : Keyboard.dismiss}
+      style={styles.container}
+    >
       <ImageBackground
         source={require("../assets/background-image.png")}
         style={styles.image}
