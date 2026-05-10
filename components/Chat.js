@@ -5,6 +5,7 @@ import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import {
   collection,
   query,
+  where,
   orderBy,
   onSnapshot,
   addDoc,
@@ -60,9 +61,14 @@ export default function Chat({ navigation, route, db, isConnected }) {
       },
     });
 
-    // Fetching messages from Firebase if connected, otherwise from local storage
+    // Fetching messages from Firebase if connected, otherwise from local storage.
+    // Each anonymous user sees only their own messages (per-user scoping).
     if (isConnected) {
-      const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+      const q = query(
+        collection(db, "messages"),
+        where("user._id", "==", userID),
+        orderBy("createdAt", "desc")
+      );
       const unsubscribe = onSnapshot(q, async (querySnapshot) => {
         const fetchedMessages = [];
         querySnapshot.forEach((doc) => {
