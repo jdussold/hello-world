@@ -107,7 +107,6 @@ export default function Chat({ navigation, route, db, isConnected }) {
       user: {
         _id: route.params.userID,
         name: route.params.name,
-        avatar: "https://placebear.com/140/140",
       },
     });
   };
@@ -150,7 +149,6 @@ export default function Chat({ navigation, route, db, isConnected }) {
         user={{
           _id: userID,
           name,
-          avatar: "https://placebear.com/140/140",
         }}
       />
       <Button title="Leave Chat" onPress={() => navigation.navigate("Start")} />
