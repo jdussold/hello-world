@@ -63,21 +63,23 @@ const CustomActions = ({
   // Pick image from media library
   const pickImage = async () => {
     const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (granted) {
-      const { assets, canceled } = await ImagePicker.launchImageLibraryAsync();
-      if (!canceled) await uploadAndSendImage(assets[0].uri);
-      else Alert.alert("Permissions haven't been granted.");
+    if (!granted) {
+      Alert.alert("Permissions haven't been granted.");
+      return;
     }
+    const { assets, canceled } = await ImagePicker.launchImageLibraryAsync();
+    if (!canceled) await uploadAndSendImage(assets[0].uri);
   };
 
   // Take photo using camera
   const takePhoto = async () => {
     const { granted } = await ImagePicker.requestCameraPermissionsAsync();
-    if (granted) {
-      const { assets, canceled } = await ImagePicker.launchCameraAsync();
-      if (!canceled) await uploadAndSendImage(assets[0].uri);
-      else Alert.alert("Permissions haven't been granted.");
+    if (!granted) {
+      Alert.alert("Permissions haven't been granted.");
+      return;
     }
+    const { assets, canceled } = await ImagePicker.launchCameraAsync();
+    if (!canceled) await uploadAndSendImage(assets[0].uri);
   };
 
   // Get current location

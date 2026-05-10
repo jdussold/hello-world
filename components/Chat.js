@@ -1,12 +1,6 @@
 // Import the necessary modules
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Button,
-  StyleSheet,
-  Platform,
-  KeyboardAvoidingView,
-} from "react-native";
+import { View, Button, StyleSheet, Platform } from "react-native";
 import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import {
   collection,
@@ -17,7 +11,10 @@ import {
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomActions from "./CustomActions";
-import MapView from "react-native-maps";
+
+// react-native-maps has no web support; eager import crashes the web bundle.
+const MapView =
+  Platform.OS === "web" ? null : require("react-native-maps").default;
 
 // Function to customize the appearance of chat bubbles
 const renderBubble = (props) => {
@@ -123,7 +120,7 @@ export default function Chat({ navigation, route, db, isConnected, storage }) {
   // Render custom view for displaying locations
   const renderCustomView = (props) => {
     const { currentMessage } = props;
-    if (currentMessage.location) {
+    if (currentMessage.location && MapView) {
       return (
         <View style={{ margin: 5, borderRadius: 13, overflow: "hidden" }}>
           <MapView
@@ -159,9 +156,6 @@ export default function Chat({ navigation, route, db, isConnected, storage }) {
           avatar: "https://placebear.com/140/140",
         }}
       />
-      {Platform.OS === "android" ? (
-        <KeyboardAvoidingView behavior="height" />
-      ) : null}
       <Button title="Leave Chat" onPress={() => navigation.navigate("Start")} />
     </View>
   );

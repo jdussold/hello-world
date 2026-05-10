@@ -17,10 +17,7 @@ import { LogBox, Alert } from "react-native";
 import { getStorage } from "firebase/storage";
 
 // Ignore expo warning messages
-LogBox.ignoreLogs([
-  "AsyncStorage has been extracted from",
-  "Cannot connect to Metro",
-]);
+LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 
 // Create a navigator using createStackNavigator
 const Stack = createStackNavigator();
