@@ -40,7 +40,7 @@ const renderInputToolbar = (isConnected) => (props) => {
 };
 
 // Define the Chat component as the default export of the module
-export default function Chat({ navigation, route, db, isConnected, storage }) {
+export default function Chat({ navigation, route, db, isConnected }) {
   //State for storing chat messages
   const [messages, setMessages] = useState([]);
   const { name, userID } = route.params;
@@ -112,10 +112,7 @@ export default function Chat({ navigation, route, db, isConnected, storage }) {
     });
   };
 
-  //Render custom actions for sending images, locations, etc...
-  const renderCustomActions = (props) => {
-    return <CustomActions storage={storage} {...props} />;
-  };
+  const renderCustomActions = (props) => <CustomActions {...props} />;
 
   // Render custom view for displaying locations
   const renderCustomView = (props) => {
