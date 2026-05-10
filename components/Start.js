@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Keyboard,
-  TouchableWithoutFeedback,
+  Pressable,
   Alert,
 } from "react-native";
 import { getAuth, signInAnonymously } from "firebase/auth";
@@ -76,12 +76,12 @@ const Start = ({ navigation }) => {
   ));
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <ImageBackground
-          source={require("../assets/background-image.png")}
-          style={styles.image}
-        >
+    <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+      <ImageBackground
+        source={require("../assets/background-image.png")}
+        style={styles.image}
+        resizeMode="cover"
+      >
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Hello World!</Text>
           </View>
@@ -110,9 +110,8 @@ const Start = ({ navigation }) => {
               <Text style={styles.buttonText}>Start Chatting</Text>
             </TouchableOpacity>
           </View>
-        </ImageBackground>
-      </View>
-    </TouchableWithoutFeedback>
+      </ImageBackground>
+    </Pressable>
   );
 };
 
@@ -124,7 +123,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    resizeMode: "cover",
   },
   titleContainer: {
     flex: 2,
