@@ -13,7 +13,7 @@ import Start from "./components/Start";
 import Chat from "./components/Chat";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useEffect } from "react";
-import { LogBox, Alert } from "react-native";
+import { LogBox, Alert, Platform, View, StyleSheet } from "react-native";
 
 // Ignore expo warning messages
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
@@ -48,24 +48,46 @@ const App = () => {
     }
   }, [connectionStatus.isConnected]);
 
-  // Render the app with NavigationContainer and Stack.Navigator
+  // Render the app with NavigationContainer and Stack.Navigator.
+  // On web, wrap in a phone-shaped container so a mobile-designed UI
+  // doesn't stretch absurdly across a desktop viewport.
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Start">
-        {/* Define two screens using Stack.Screen, with Start and Chat components as their respective components */}
-        <Stack.Screen name="Start" component={Start} />
-        <Stack.Screen name="Chat">
-          {(props) => (
-            <Chat
-              isConnected={connectionStatus.isConnected}
-              db={db}
-              {...props}
-            />
-          )}
-        </Stack.Screen>
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={styles.root}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Start">
+          <Stack.Screen
+            name="Start"
+            component={Start}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="Chat">
+            {(props) => (
+              <Chat
+                isConnected={connectionStatus.isConnected}
+                db={db}
+                {...props}
+              />
+            )}
+          </Stack.Screen>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  root: Platform.select({
+    web: {
+      width: "100%",
+      height: "100%",
+      maxWidth: 480,
+      maxHeight: 900,
+      marginHorizontal: "auto",
+      boxShadow: "0 0 24px rgba(0, 0, 0, 0.15)",
+      overflow: "hidden",
+    },
+    default: { flex: 1 },
+  }),
+});
 
 export default App;
