@@ -31,7 +31,8 @@ To get started with the application, follow these steps:
 
 1.  Clone the repository to your local machine.
 2.  Install the dependencies by running `npm install`.
-3.  Start the application by running `npm start`.
+3.  Copy `.env.example` to `.env` and fill in your own Firebase project values (see "Firebase Configuration" below).
+4.  Start the application by running `npm start`.
 
 ## Technical Information
 
@@ -87,20 +88,18 @@ The `App` component imports and renders two other components:
 
 ## Firebase Configuration
 
-The `App` component requires a Firebase configuration object with the following properties:
+The `App` component reads its Firebase configuration from environment variables (see `.env.example` for the required keys):
 
 ```
-const firebaseConfig = {
-  apiKey: "<API_KEY>",
-  authDomain: "<AUTH_DOMAIN>",
-  projectId: "<PROJECT_ID>",
-  storageBucket: "<STORAGE_BUCKET>",
-  messagingSenderId: "<MESSAGING_SENDER_ID>",
-  appId: "<APP_ID>"
-};
+EXPO_PUBLIC_FIREBASE_API_KEY=...
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+EXPO_PUBLIC_FIREBASE_APP_ID=...
 ```
 
-To set up Firebase, you need to create a project in the Firebase Console, enable Firestore and Anonymous Authentication, and then copy the configuration object to your app. For more information, see the Firebase documentation. (Cloud Storage is not used by this app — see the note at the top of this README.)
+To set up Firebase: create a project in the Firebase Console, enable Firestore and Anonymous Authentication, then copy the project's web-app config values into your local `.env` file. (Cloud Storage is not used by this app — see the note at the top of this README.) The `.env` file is gitignored; only `.env.example` is committed.
 
 ## Network Status
 

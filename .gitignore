@@ -13,6 +13,11 @@ web-build/
 # macOS
 .DS_Store
 
+# Local environment config (committed sample lives in .env.example)
+.env
+.env.local
+.env.*.local
+
 # AI files
 CLAUDE.md
 
