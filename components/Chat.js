@@ -34,10 +34,12 @@ const renderBubble = (props) => {
   );
 };
 
-// Function to conditionally render the input toolbar based upon a users connection status
-const renderInputToolbar = (isConnected) => (props) => {
-  if (isConnected) return <InputToolbar {...props} />;
-  else return null;
+// Function to conditionally render the input toolbar based upon a user's connection status.
+// The inner const-named function gives React a proper displayName.
+const renderInputToolbar = (isConnected) => {
+  const InputToolbarOrHidden = (props) =>
+    isConnected ? <InputToolbar {...props} /> : null;
+  return InputToolbarOrHidden;
 };
 
 // Define the Chat component as the default export of the module
@@ -103,7 +105,14 @@ export default function Chat({ navigation, route, db, isConnected }) {
         }
       });
     }
-  }, [navigation, route.params.name, route.params.color, db, isConnected]);
+  }, [
+    navigation,
+    route.params.name,
+    route.params.color,
+    db,
+    isConnected,
+    userID,
+  ]);
 
   // Function that adds a new message to the "messages" collection in Firestore when the user sends a message
   const onSend = (newMessages) => {

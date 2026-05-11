@@ -7,7 +7,10 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "postinstall": "find node_modules -path '*/.claude' -type d -exec rm -rf {} +"
+    "postinstall": "find node_modules -path '*/.claude' -type d -exec rm -rf {} +",
+    "lint": "expo lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -33,7 +36,11 @@
     "react-native-worklets": "0.7.4"
   },
   "devDependencies": {
-    "@babel/core": "7.29.0"
+    "@babel/core": "7.29.0",
+    "eslint": "9.39.4",
+    "eslint-config-expo": "55.0.0",
+    "eslint-config-prettier": "10.1.8",
+    "prettier": "3.8.3"
   },
   "overrides": {
     "postcss": "^8.5.10"

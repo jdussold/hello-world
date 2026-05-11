@@ -10,7 +10,6 @@ import {
   Keyboard,
   Pressable,
   Platform,
-  Alert,
 } from "react-native";
 import { getAuth, signInAnonymously } from "firebase/auth";
 
@@ -51,11 +50,6 @@ const Start = ({ navigation }) => {
         setError("Could not sign in. Please try again.");
       });
   };
-
-  // Destructure background color styles from backgroundColors object
-  const { black, purple, grey, green } = backgroundColors;
-  // Define default color if none selected
-  const defaultColor = "#FFFFFF";
 
   // Map over backgroundColors object to create color options for user to choose from
   const colorOptions = Object.entries(backgroundColors).map(([key, value]) => (
