@@ -1,23 +1,21 @@
 // Import the necessary modules
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Button,
-  StyleSheet,
-  Platform,
-  KeyboardAvoidingView,
-} from "react-native";
+import { View, Button, StyleSheet, Platform } from "react-native";
 import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import {
   collection,
   query,
+  where,
   orderBy,
   onSnapshot,
   addDoc,
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomActions from "./CustomActions";
-import MapView from "react-native-maps";
+
+// react-native-maps has no web support; eager import crashes the web bundle.
+const MapView =
+  Platform.OS === "web" ? null : require("react-native-maps").default;
 
 // Function to customize the appearance of chat bubbles
 const renderBubble = (props) => {
@@ -36,14 +34,16 @@ const renderBubble = (props) => {
   );
 };
 
-// Function to conditionally render the input toolbar based upon a users connection status
-const renderInputToolbar = (isConnected) => (props) => {
-  if (isConnected) return <InputToolbar {...props} />;
-  else return null;
+// Function to conditionally render the input toolbar based upon a user's connection status.
+// The inner const-named function gives React a proper displayName.
+const renderInputToolbar = (isConnected) => {
+  const InputToolbarOrHidden = (props) =>
+    isConnected ? <InputToolbar {...props} /> : null;
+  return InputToolbarOrHidden;
 };
 
 // Define the Chat component as the default export of the module
-export default function Chat({ navigation, route, db, isConnected, storage }) {
+export default function Chat({ navigation, route, db, isConnected }) {
   //State for storing chat messages
   const [messages, setMessages] = useState([]);
   const { name, userID } = route.params;
@@ -63,9 +63,14 @@ export default function Chat({ navigation, route, db, isConnected, storage }) {
       },
     });
 
-    // Fetching messages from Firebase if connected, otherwise from local storage
+    // Fetching messages from Firebase if connected, otherwise from local storage.
+    // Each anonymous user sees only their own messages (per-user scoping).
     if (isConnected) {
-      const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+      const q = query(
+        collection(db, "messages"),
+        where("user._id", "==", userID),
+        orderBy("createdAt", "desc")
+      );
       const unsubscribe = onSnapshot(q, async (querySnapshot) => {
         const fetchedMessages = [];
         querySnapshot.forEach((doc) => {
@@ -100,7 +105,14 @@ export default function Chat({ navigation, route, db, isConnected, storage }) {
         }
       });
     }
-  }, [navigation, route.params.name, route.params.color, db, isConnected]);
+  }, [
+    navigation,
+    route.params.name,
+    route.params.color,
+    db,
+    isConnected,
+    userID,
+  ]);
 
   // Function that adds a new message to the "messages" collection in Firestore when the user sends a message
   const onSend = (newMessages) => {
@@ -110,20 +122,16 @@ export default function Chat({ navigation, route, db, isConnected, storage }) {
       user: {
         _id: route.params.userID,
         name: route.params.name,
-        avatar: "https://placebear.com/140/140",
       },
     });
   };
 
-  //Render custom actions for sending images, locations, etc...
-  const renderCustomActions = (props) => {
-    return <CustomActions storage={storage} {...props} />;
-  };
+  const renderCustomActions = (props) => <CustomActions {...props} />;
 
   // Render custom view for displaying locations
   const renderCustomView = (props) => {
     const { currentMessage } = props;
-    if (currentMessage.location) {
+    if (currentMessage.location && MapView) {
       return (
         <View style={{ margin: 5, borderRadius: 13, overflow: "hidden" }}>
           <MapView
@@ -156,12 +164,8 @@ export default function Chat({ navigation, route, db, isConnected, storage }) {
         user={{
           _id: userID,
           name,
-          avatar: "https://placebear.com/140/140",
         }}
       />
-      {Platform.OS === "android" ? (
-        <KeyboardAvoidingView behavior="height" />
-      ) : null}
       <Button title="Leave Chat" onPress={() => navigation.navigate("Start")} />
     </View>
   );

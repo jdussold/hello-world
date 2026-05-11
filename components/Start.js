@@ -5,13 +5,11 @@ import {
   Text,
   TextInput,
   Image,
-  ImageBackground,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
   Keyboard,
-  TouchableWithoutFeedback,
-  Alert,
+  Pressable,
+  Platform,
 } from "react-native";
 import { getAuth, signInAnonymously } from "firebase/auth";
 
@@ -28,37 +26,30 @@ const SelectedColorOverlay = () => <View style={styles.selectedColorOverlay} />;
 
 // The main Start component
 const Start = ({ navigation }) => {
-  // Declare state variables for user's name and selected color
   const [name, setName] = useState("");
   const [color, setColor] = useState("");
+  const [error, setError] = useState("");
 
-  // Function to handle anonymous sign-in with Firebase Auth
   const handleSignIn = () => {
+    if (!name.trim()) {
+      setError("Please enter your name to continue.");
+      return;
+    }
+    setError("");
     const auth = getAuth();
     signInAnonymously(auth)
       .then((userCredential) => {
         const user = userCredential.user;
-        // Navigate to Chat screen with user's name, color, and ID
         navigation.navigate("Chat", {
-          name,
+          name: name.trim(),
           color: color || "#FFFFFF",
           userID: user.uid,
         });
-        Alert.alert("Signed in Successfully!");
       })
-      .catch((error) => {
-        Alert.alert("Unable to add. Please try later");
+      .catch(() => {
+        setError("Could not sign in. Please try again.");
       });
   };
-
-  // Destructure background color styles from backgroundColors object
-  const { black, purple, grey, green } = backgroundColors;
-  // Get height of device window
-  const windowHeight = Dimensions.get("window").height;
-  // Calculate height of colored box
-  const boxHeight = windowHeight * 0.44;
-  // Define default color if none selected
-  const defaultColor = "#FFFFFF";
 
   // Map over backgroundColors object to create color options for user to choose from
   const colorOptions = Object.entries(backgroundColors).map(([key, value]) => (
@@ -76,43 +67,53 @@ const Start = ({ navigation }) => {
   ));
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <ImageBackground
-          source={require("../assets/background-image.png")}
-          style={styles.image}
-        >
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>Hello World!</Text>
+    <Pressable
+      // Web has no soft keyboard; tap-to-dismiss only applies to native.
+      // Without the platform gate, click events bubble from TextInput to this
+      // Pressable and Keyboard.dismiss() blurs the just-focused input.
+      onPress={Platform.OS === "web" ? undefined : Keyboard.dismiss}
+      style={styles.container}
+    >
+      <Image
+        source={require("../assets/background-image.png")}
+        style={[
+          StyleSheet.absoluteFillObject,
+          { width: "100%", height: "100%" },
+        ]}
+        resizeMode="cover"
+      />
+      <View style={styles.overlay}>
+        <Text style={styles.title}>Hello World!</Text>
+        <View style={styles.box}>
+          <View style={styles.inputContainer}>
+            <Image
+              source={require("../assets/icon.png")}
+              style={styles.inputImage}
+              resizeMode="contain"
+            />
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => {
+                setName(text);
+                if (error) setError("");
+              }}
+              value={name}
+              placeholder="Your Name"
+              placeholderTextColor="#ADADAD"
+              returnKeyType="done"
+            />
           </View>
-          <View style={[styles.box, { height: boxHeight }]}>
-            <View style={styles.inputContainer}>
-              <Image
-                source={require("../assets/icon.png")}
-                style={styles.inputImage}
-              />
-              <TextInput
-                style={styles.input}
-                onChangeText={setName}
-                value={name}
-                placeholder="Your Name"
-                placeholderTextColor="#ADADAD"
-                returnKeyType="done"
-              />
-            </View>
-            <View style={styles.colorContainer}>
-              <Text style={styles.colorLabel}>
-                Choose your Background Color:
-              </Text>
-              <View style={styles.colorOptions}>{colorOptions}</View>
-            </View>
-            <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-              <Text style={styles.buttonText}>Start Chatting</Text>
-            </TouchableOpacity>
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          <View style={styles.colorContainer}>
+            <Text style={styles.colorLabel}>Choose your background color</Text>
+            <View style={styles.colorOptions}>{colorOptions}</View>
           </View>
-        </ImageBackground>
+          <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+            <Text style={styles.buttonText}>Start Chatting</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </TouchableWithoutFeedback>
+    </Pressable>
   );
 };
 
@@ -120,41 +121,45 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  image: {
+  overlay: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
-    resizeMode: "cover",
-  },
-  titleContainer: {
-    flex: 2,
-    justifyContent: "center",
+    paddingTop: 80,
+    paddingBottom: 40,
   },
   title: {
     fontSize: 45,
     fontWeight: "600",
     color: "#FFFFFF",
     textAlign: "center",
-    marginBottom: "45%",
+    textShadow: "0 2px 6px rgba(0, 0, 0, 0.4)",
   },
   box: {
     backgroundColor: "#FFFFFF",
     width: "88%",
     alignItems: "center",
-    marginBottom: "6%",
-    paddingTop: 20,
-    paddingBottom: 20,
-    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 24,
     flexDirection: "column",
+    borderRadius: 12,
+    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.18)",
+    gap: 16,
   },
   inputContainer: {
-    width: "88%",
+    width: "100%",
     flexDirection: "row",
     alignItems: "center",
     borderColor: "#DBDBDB",
-    borderWidth: 2,
-    paddingHorizontal: 10,
-    marginBottom: 20,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+  },
+  errorText: {
+    width: "100%",
+    color: "#C0392B",
+    fontSize: 13,
+    paddingHorizontal: 4,
   },
   input: {
     height: 50,
@@ -163,25 +168,21 @@ const styles = StyleSheet.create({
   inputImage: {
     width: 24,
     height: 24,
-    resizeMode: "contain",
     marginRight: 10,
     opacity: 0.6,
   },
   colorContainer: {
-    width: "88%",
-    flex: 1,
+    width: "100%",
   },
   colorLabel: {
-    fontSize: 18,
-    fontWeight: "300",
+    fontSize: 16,
+    fontWeight: "400",
     color: "#757083",
-    marginBottom: 10,
-    marginTop: "10%",
+    marginBottom: 12,
   },
   colorOptions: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 10,
+    justifyContent: "space-around",
   },
   color: {
     width: 40,
@@ -203,10 +204,11 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#757083",
-    width: "88%",
+    width: "100%",
     height: 50,
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: 10,
   },
   buttonText: {
     fontSize: 16,

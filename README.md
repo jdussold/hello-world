@@ -2,7 +2,9 @@
 
 ![Hello World App](./assets/start.png)
 
-This is a simple chat application built using React Native. It allows users to enter a chat room and exchange messages, images and location data with their friends and family. The application stores data both online and offline, allowing users to read their messages even when offline.
+This is a simple chat application built using React Native. It allows users to enter a chat room and exchange text messages and location data with their friends and family. The application stores data both online and offline, allowing users to read their messages even when offline.
+
+> **Note on image uploads:** an earlier version of this app supported sending images via Firebase Cloud Storage. Image upload was dropped in 2026-05 because Firebase Cloud Storage now requires the pay-as-you-go Blaze plan with a credit card on file (see [Firebase's official announcement](https://firebase.google.com/docs/storage/faqs-storage-changes-announced-sept-2024)). Text messages and location sharing are unaffected — they use Firestore and Anonymous Auth, which remain free on the Spark plan.
 
 ## User Stories
 
@@ -10,7 +12,6 @@ The application aims to fulfill the following user stories:
 
 - As a new user, I want to be able to easily enter a chat room so I can quickly start talking to my friends and family.
 - As a user, I want to be able to send messages to my friends and family members to exchange the latest news.
-- As a user, I want to send images to my friends to show them what I'm currently doing.
 - As a user, I want to share my location with my friends to show them where I am.
 - As a user, I want to be able to read my messages offline so I can reread conversations at any time.
 - As a user with a visual impairment, I want to use a chat app that is compatible with a screen reader so that I can engage with a chat interface.
@@ -21,7 +22,7 @@ The application provides the following key features:
 
 - A page where users can enter their name and choose a background color for the chat screen before joining the chat.
 - A page displaying the conversation, as well as an input field and submit button.
-- The chat must provide users with two additional communication features: sending images and location data.
+- The chat provides an additional communication feature: sharing the sender's current location.
 - Data gets stored online and offline.
 
 ## Getting Started
@@ -30,7 +31,8 @@ To get started with the application, follow these steps:
 
 1.  Clone the repository to your local machine.
 2.  Install the dependencies by running `npm install`.
-3.  Start the application by running `npm start`.
+3.  Copy `.env.example` to `.env` and fill in your own Firebase project values (see "Firebase Configuration" below).
+4.  Start the application by running `npm start`.
 
 ## Technical Information
 
@@ -57,7 +59,6 @@ The `App` component requires the following dependencies to be installed:
 - `react-native-gesture-handler`
 - `firebase/app`
 - `firebase/firestore`
-- `firebase/storage`
 - `@react-native-community/netinfo`
 
 ## Usage
@@ -87,20 +88,18 @@ The `App` component imports and renders two other components:
 
 ## Firebase Configuration
 
-The `App` component requires a Firebase configuration object with the following properties:
+The `App` component reads its Firebase configuration from environment variables (see `.env.example` for the required keys):
 
 ```
-const firebaseConfig = {
-  apiKey: "<API_KEY>",
-  authDomain: "<AUTH_DOMAIN>",
-  projectId: "<PROJECT_ID>",
-  storageBucket: "<STORAGE_BUCKET>",
-  messagingSenderId: "<MESSAGING_SENDER_ID>",
-  appId: "<APP_ID>"
-};
+EXPO_PUBLIC_FIREBASE_API_KEY=...
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+EXPO_PUBLIC_FIREBASE_APP_ID=...
 ```
 
-To set up Firebase, you need to create a project in the Firebase Console, enable the Firestore and Storage services, and then copy the configuration object to your app. For more information, see the Firebase documentation.
+To set up Firebase: create a project in the Firebase Console, enable Firestore and Anonymous Authentication, then copy the project's web-app config values into your local `.env` file. (Cloud Storage is not used by this app — see the note at the top of this README.) The `.env` file is gitignored; only `.env.example` is committed.
 
 ## Network Status
 
@@ -110,9 +109,9 @@ The `App` component uses the `useNetInfo` hook from `@react-native-community/net
 
 The `App` component uses `createStackNavigator` from `@react-navigation/stack` to set up the navigation between the `Start` and `Chat` screens.
 
-## Firestore and Storage
+## Firestore
 
-The `App` component initializes the Firebase app, Firestore database, and Storage instance using the `initializeApp`, `getFirestore`, and `getStorage` functions from `firebase/app`, `firebase/firestore`, and `firebase/storage`, respectively.
+The `App` component initializes the Firebase app and Firestore database using the `initializeApp` and `getFirestore` functions from `firebase/app` and `firebase/firestore`, respectively.
 
 ## Alert and LogBox
 
@@ -196,7 +195,7 @@ The following modules and components are used in the Chat component:
 - Gifted Chat
 - AsyncStorage
 - CustomActions
-- MapView
+- MapView (native targets only — gated out on web; see comment in `Chat.js`)
 
 ### Usage
 
@@ -210,8 +209,6 @@ The Chat component can be imported and used in any parent component like any oth
 
 - `isConnected`: This is a boolean value that is passed in to indicate whether the user is connected to the internet or not. If the user is offline, messages will be stored locally until the user is connected again.
 
-- `storage`: This is a reference to the Firebase Storage service. It is used to upload and download images that are sent through the chat.
-
 ### Customizations
 
 The Chat component can be customized in several ways:
@@ -220,7 +217,7 @@ The Chat component can be customized in several ways:
 
 - Custom input toolbar: The input toolbar can be conditionally rendered based on the user's connection status using the `renderInputToolbar` function.
 
-- Custom actions: Custom actions such as sending images and location data can be added using the `renderCustomActions` function.
+- Custom actions: Custom actions such as sharing location data can be added using the `renderCustomActions` function.
 
 - Custom view for displaying locations: The `renderCustomView` function can be used to create a custom view for displaying location data.
 
@@ -229,23 +226,21 @@ The Chat component can be customized in several ways:
 ```
 import React from 'react';
 import { View } from 'react-native';
-import firebase from 'firebase';
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 import Chat from './Chat';
 
-// Initialize Firebase app
-firebase.initializeApp({
-// your firebase config goes here
+const app = initializeApp({
+  // your firebase config goes here
 });
 
 const App = () => {
-const db = firebase.firestore();
-const storage = firebase.storage();
-
-return (
-<View style={{ flex: 1 }}>
-<Chat db={db} storage={storage} />
-</View>
-);
+  const db = getFirestore(app);
+  return (
+    <View style={{ flex: 1 }}>
+      <Chat db={db} />
+    </View>
+  );
 };
 
 export default App;
@@ -257,7 +252,7 @@ Note: In the above example, the `isConnected` prop is not passed in explicitly, 
 
 ![Custom Actions](./assets/custom-actions.png)
 
-`CustomActions.js` is a component that allows users to perform different actions within the chat interface, such as uploading an image, taking a photo, or sharing their current location.
+`CustomActions.js` is a component that allows users to share their current location within the chat interface. Earlier versions also supported picking an image from the library or taking a photo with the camera; those features were removed when Firebase Cloud Storage moved to a Blaze-only model (see the note at the top of this README).
 
 Usage:
 
@@ -267,11 +262,9 @@ To use the `CustomActions` component, import it into your React Native project a
 import CustomActions from './CustomActions';
 
 <CustomActions
-wrapperStyle={{}}
-iconTextStyle={{}}
-storage={firebase.storage()}
-onSend={(message) => handleSend(message)}
-userID={currentUser.uid}
+  wrapperStyle={{}}
+  iconTextStyle={{}}
+  onSend={(message) => handleSend(message)}
 />
 ```
 
@@ -281,27 +274,20 @@ The `CustomActions` component accepts the following props:
 
 - `wrapperStyle` (optional): Custom styles to be applied to the container of the action button.
 - `iconTextStyle` (optional): Custom styles to be applied to the text of the action button.
-- `storage` (required): An instance of Firebase storage.
 - `onSend` (required): A callback function to be executed when the user sends a message.
-- `userID` (required): The ID of the current user.
 
 Methods:
 
 The `CustomActions` component has the following methods:
 
-- `pickImage()`: Allows users to select an image from their device's media library.
-- `takePhoto()`: Allows users to take a photo with their device's camera.
 - `getLocation()`: Retrieves the user's current location and sends it as a message.
-- `uploadAndSendImage(imageURI)`: Uploads an image to Firebase storage and sends it as a message.
 
 Dependencies:
 
 The `CustomActions` component has the following dependencies:
 
 - `@expo/react-native-action-sheet`: A library that provides a cross-platform `ActionSheet` component for React Native.
-- `expo-image-picker`: A library that provides an interface for accessing the device's media library and camera.
 - `expo-location`: A library that provides an interface for accessing the device's current location.
-- `firebase/storage`: Firebase storage module for storing and retrieving files.
 
 Note: Make sure to install these dependencies in your project before using the `CustomActions` component.
 
